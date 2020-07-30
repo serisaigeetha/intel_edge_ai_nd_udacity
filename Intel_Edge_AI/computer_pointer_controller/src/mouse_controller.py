@@ -11,7 +11,7 @@ import pyautogui
 pyautogui.FAILSAFE = False
 class MouseController:
     def __init__(self, precision, speed):
-        precision_dict={'high':100, 'low':1000, 'medium':500}
+        precision_dict={'high':30, 'low':1000, 'medium':500}
         speed_dict={'fast':1, 'slow':10, 'medium':1.5}
 
         self.precision=precision_dict[precision]
