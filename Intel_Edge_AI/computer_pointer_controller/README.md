@@ -28,6 +28,8 @@ project
 │   │---  head-pose-estimation-adas-0001
 │   |---  landmarks-regression-retail-0009
 |
+|---output
+|
 |---src
 |     face_detection.py
 |     gaze_estimation.py
@@ -61,7 +63,8 @@ python src/main.py -i bin/demo.mp4 -d CPU -pt 0.4 -l /opt/intel/openvino/deploym
 python src/main.py -i bin/demo.mp4 -d CPU -pt 0.4 -l /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so -fd models/face-detection-adas-0001/FP16/face-detection-adas-0001 -fl models/landmarks-regression-retail-0009/FP16/landmarks-regression-retail-0009 -hp models/head-pose-estimation-adas-0001/FP16/head-pose-estimation-adas-0001 -ge models/gaze-estimation-adas-0002/FP16/gaze-estimation-adas-0002
 ```
 
-
+## Output
+[![Output Video](output/out_short.gif)]
 ## Benchmarks
 
 __FP32:__\
