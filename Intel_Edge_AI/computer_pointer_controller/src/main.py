@@ -105,6 +105,8 @@ def main():
     frame_counter=0
     start_inference_time=time.time()
     total_time = 0
+    out = cv2.VideoWriter('outvideo.mp4',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (1920, 1080))
+
     try:
         while(cap.isOpened()):        
             
@@ -117,35 +119,24 @@ def main():
                 coords, cropped_image = fd.predict(frame)
 
                 pitch, rolls, yaw =hp.predict(cropped_image)
-                #yaw, pitch, rolls = fl.predict(image)
-                # log.info("yaw")
-                # log.info(yaw)
-                # log.info("pitch")
-                # log.info(pitch)
-                # log.info("rolls")
-                # log.info(rolls)
+
                 left_eye, right_eye,out_image = fl.predict(cropped_image)
-                #log.info(image)
-                # log.info("eye1")
-                # log.info(left_eye)
-                # log.info("eye2")
-                # log.info(right_eye)
-                #log.
+
                 x,y, z = ge.predict(left_eye,right_eye,[yaw, pitch, rolls],out_image)
-                # log.info("mouse_coor")
-                # log.info(x)
-                # log.info("gaze_vec")
-                # log.info(y)
+
                 total_time = total_time + time.time() - start_inference_time
                 try :
+                    cv2.namedWindow('output', cv2.WINDOW_NORMAL)
+                    cv2.setWindowProperty('output', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
                     cv2.imshow('output', frame)  
                 except cv2.error as e:  
                     print('Invalid frame!')
                 if cv2.waitKey(50) & 0xFF == ord('q'):
                     break  
-                mc = MouseController('high','fast')
-                mc.move(x,y)
-                
+                if frame_counter%5==0:
+                    mc = MouseController('high','fast')
+                    mc.move(x,y)
+                out.write(frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

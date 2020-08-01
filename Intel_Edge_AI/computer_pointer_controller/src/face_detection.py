@@ -27,20 +27,16 @@ class FaceDetect:
 
         try:
             self.core = IECore()            
-            self.model = IENetwork(model=self.model_structure, weights=self.model_weights)#self.core.read_network(model=self.model_structure, weights=self.model_weights)
+            self.model = IENetwork(model=self.model_structure, weights=self.model_weights)
         except Exception as e:
             raise ValueError("Could not Initialise the network. Have you enterred the correct model path?")
 
         self.input_name=next(iter(self.model.inputs))
         self.input_shape=self.model.inputs[self.input_name].shape
-        #log.info(self.input_shape)
         self.output_name=next(iter(self.model.outputs))
         self.output_shape=self.model.outputs[self.output_name].shape   
  
-        #log.info(self.model.outputs)
-        #log.info(self.output_shape)
-        #log.info(self.output_name)
-        #log.info("face detection model is initialized")     
+ 
        
     def load_model(self):
         '''
@@ -48,7 +44,6 @@ class FaceDetect:
         This method is for loading the model to the device specified by the user.
         If your model requires any Plugins, this is where you can load them.
         '''
-        #log.info("load_model starts")
         supported_layers = self.core.query_network(network=self.model, device_name=self.device)        
         unsupported_layers = [l for l in self.model.layers.keys() if l not in supported_layers]           
         if len(unsupported_layers) != 0:
@@ -56,7 +51,7 @@ class FaceDetect:
         self.core.add_extension(CPU_EXTENSION, device_name=self.device)
 
         self.exec_network = self.core.load_network(self.model, device_name=self.device, num_requests=1)
-        #log.info("face detect model is loaded")
+
         
 
     def predict(self, image):
@@ -70,22 +65,18 @@ class FaceDetect:
         self.infer_status = self.exec_network.requests[0].wait(-1)       
 
         if self.infer_status == 0:        
-            self.result = self.exec_network.requests[0].outputs[self.output_name]
-            #log.info(self.result)            
+            self.result = self.exec_network.requests[0].outputs[self.output_name]    
             return self.draw_outputs(self.result,image)
 
-        
-        
+    
     
     def draw_outputs(self, coords, image):
         
-        #logging.info("draw_output starts")
- 
         detect_coor = []
         width = image.shape[1]
         height = image.shape[0]   
 
-        for box in coords[0][0]: # Output shape is 1x1x100x7
+        for box in coords[0][0]: 
                     conf = box[2]
                     if conf >= self.threshold:
                         xmin = int(box[3] * width) - 10
@@ -94,13 +85,11 @@ class FaceDetect:
                         ymax = int(box[6] * height) + 10
                         cv2.rectangle(image, (xmin, ymin), (xmax, ymax),  (0, 255, 0), 2)                        
                         detect_coor.append((xmin,ymin,xmax,ymax))
-                        cropped_image = image[ymin:ymax, xmin:xmax]
-        
-        #log.info("face detection output successful")
+                        cropped_image = image[ymin:ymax, xmin:xmax]        
+
         return detect_coor, cropped_image
 
-    def check_model(self):
-        return None
+
 
     def preprocess_input(self, image):
         '''
@@ -110,12 +99,7 @@ class FaceDetect:
         p_frame = cv2.resize(image, (self.input_shape[3], self.input_shape[2]))
         p_frame = p_frame.transpose((2,0,1))
         p_frame = p_frame.reshape(1, *p_frame.shape)
-        #log.info("preprocess ends")
+
         return p_frame
 
-    def preprocess_output(self, outputs):
-        '''
-        Before feeding the output of this model to the next model,
-        you might have to preprocess the output. This function is where you can do that.
-        '''
-        return None
+
